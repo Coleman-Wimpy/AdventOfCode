@@ -7,6 +7,10 @@ import java.util.ArrayList;
 
 public class Day1 {
 
+    private static int part1Pass = 0;
+    private static int part2Pass = 0;
+    private static boolean startAt0 = false;
+
     public static void main(String[] args) {
         System.out.println("Advent of Code 2025: Day 1");
 
@@ -26,14 +30,21 @@ public class Day1 {
             e.printStackTrace();
         }
 
-        int currentPosition = 50;
-        int zeroCount = 0;
+        int startingPos = 50;
         for (String instruction : input) {
-            currentPosition = doRotation(instruction, currentPosition);
-            if (currentPosition == 0) zeroCount++;
+            startingPos = doRotation(instruction, startingPos);
+            if (startingPos == 0) {
+                part1Pass++;
+            }
         }
 
-        System.out.println("Zero count: " + zeroCount);
+        int currentPosition = 50;
+        for (String instruction : input) {
+            currentPosition = doRotationV2(instruction, currentPosition);
+        }
+
+        System.out.println("Part 1 Password: " + part1Pass);
+        System.out.println("Part 2 Password: " + part2Pass);
     }
 
     private static int doRotation(String instruction, int currentPosition) {
@@ -41,6 +52,27 @@ public class Day1 {
         int rotationAmount = Integer.parseInt(instruction.substring(1));
 
         if (rotationDir == 'R') return (currentPosition + rotationAmount) % 100;
-        else return (currentPosition - (rotationAmount + 100)) % 100;
+        else return (currentPosition - rotationAmount) % 100;
+    }
+
+    private static int doRotationV2(String instruction, int currentPosition) {
+        char rotationDir = instruction.charAt(0);
+        int rotationAmount = Integer.parseInt(instruction.substring(1));
+        int totalMoves = 0;
+        if (rotationDir == 'R') {
+            totalMoves = currentPosition + rotationAmount;
+        } else {
+            totalMoves = currentPosition - rotationAmount;
+        }
+        part2Pass += (int) Math.floor(Math.abs(totalMoves) / 100);
+        if (totalMoves < 0 && !startAt0) part2Pass++;
+        if (totalMoves == 0) part2Pass++;
+
+        int newPos = totalMoves % 100;
+        if (newPos == 0) startAt0 = true;
+        else startAt0 = false;
+        if (newPos < 0) newPos += 100;
+
+        return newPos;
     }
 }
